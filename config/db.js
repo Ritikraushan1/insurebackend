@@ -1,32 +1,24 @@
-const mysql = require('mssql')
+const { Pool } = require('pg');
 
-const mySQLConfig = {
-    database : process.env.DATABASE_NAME,
-    user : process.env.DATABASE_USER,
-    password : process.env.DATABASE_PASSWORD,
-    server : process.env.DATABASE_HOST,
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000,
-      },
-      options: {
-        encrypt: true, 
-        trustServerCertificate: true, 
-      },
-}
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false, // Required for some cloud-hosted PostgreSQL services like Heroku
+  },
+});
 
 const dbConnection = async () => {
-    try {
-      await mysql.connect(mySQLConfig);
-      console.log('Connected to SQL Server');
-    } catch (err) {
-      console.error('Error in connecting with database:', err.message);
-      process.exit(1); 
-    }
-  };
+  try {
+    const client = await pool.connect();
+    console.log('Connected to PostgreSQL');
+    client.release(); // Release the connection back to the pool
+  } catch (err) {
+    console.error('Error connecting to PostgreSQL:', err.message);
+    process.exit(1);
+  }
+};
 
 module.exports = {
-  mysql,
-  dbConnection
+  pool,
+  dbConnection,
 };
