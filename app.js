@@ -21,7 +21,7 @@ const PORT = process.env.PORT || 4000;
 
 app.use(cors({
     credentials: true,
-    origin: 'http://localhost:5173'
+    origin: 'https://insurance.ritikraushan.me'
 }))
 app.use(express.json())
 app.use(cookieParser())
